@@ -22,27 +22,8 @@ public class ServePlayerInfo {
     public static void main(String[] args) throws IOException {
         ServePlayerInfo playainfo = new ServePlayerInfo();
 
-        System.out.println(playainfo.returnPlayerInfo());
-    }
-
-    private String returnPlayerInfo() throws IOException {
-        String playerInfo = null;
-
-        try {
-            Player player = getPlayerInfo();
-
-            playerInfo = ("Player info"
-                + "\nName: " + player.name
-                + "\nRank " + player.getEurank()
-                + "\nCountry rank " + player.getCountry_rank()
-            );
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return playerInfo;
-
+        System.out.println(playainfo.getPlayerInfo().toString());
+        //System.out.println(playainfo.returnPlayerInfo());
     }
 
 }
@@ -81,6 +62,12 @@ class Player {
     Integer character_rank;
 
     public Player() { }
+
+    public String toString() {
+        return "Name: " + getName() +
+            "EU Rank: " + getEurank() +
+            "National rank " + getCountry_rank();
+    }
 
     public boolean isActive() {
         return active;

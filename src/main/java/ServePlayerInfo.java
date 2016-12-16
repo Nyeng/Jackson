@@ -11,7 +11,7 @@ public class ServePlayerInfo {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Player getPlayerInfo() throws IOException {
+    private Player consumePLayerApi() throws IOException {
         return mapper.readValue(new URL(getApi_endpoint()), Player.class);
     }
 
@@ -21,9 +21,7 @@ public class ServePlayerInfo {
 
     public static void main(String[] args) throws IOException {
         ServePlayerInfo playainfo = new ServePlayerInfo();
-
-        System.out.println(playainfo.getPlayerInfo().toString());
-        //System.out.println(playainfo.returnPlayerInfo());
+        System.out.println(playainfo.consumePLayerApi().toString());
     }
 
 }
@@ -65,8 +63,8 @@ class Player {
 
     public String toString() {
         return "Name: " + getName() +
-            "EU Rank: " + getEurank() +
-            "National rank " + getCountry_rank();
+            "\nEU Rank: " + getEurank() +
+            "\nNational rank " + getCountry_rank();
     }
 
     public boolean isActive() {

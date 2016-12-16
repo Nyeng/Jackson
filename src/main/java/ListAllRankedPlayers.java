@@ -3,7 +3,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -31,17 +31,23 @@ public class ListAllRankedPlayers {
         System.out.println(jsonArray);
         List<RankingList> objectsOfRanks = Arrays.asList(mapper.readValue(jsonArray, RankingList[].class));
 
-        Stream<RankingList> players = objectsOfRanks.stream()
-            .filter(p -> p.getSlug().contains("a"));
-        System.out.println(players.toString());
-
+//        Stream<RankingList> players = objectsOfRanks.stream()
+//            .filter(p -> p.getSlug().equals("armada"));
+//        System.out.println(players.toString());
 
         for (RankingList playah : objectsOfRanks){
-            if (playah.getSlug().equals("armada")){
+            if (playah.getSlug().equals("ice")){
                 System.out.println(playah.toString());
-
             }
         }
+
+        List<RankingList> figureheads = objectsOfRanks.stream()
+            .filter("armada"::equals)
+            .collect(Collectors.toList());
+
+        System.out.println(figureheads.toString());
+
+        //.collect(Collectors.toList());
 
     }
 

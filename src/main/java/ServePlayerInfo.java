@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,8 +16,39 @@ public class ServePlayerInfo {
         return mapper.readValue(new URL(getApi_endpoint()), Player.class);
     }
 
+    public Player consumePlayer(String player) throws IOException,NullPointerException {
+
+       //This one works:  return mapper.readValue(new URL(getBaseApiEndpoint()+ player), Player.class);
+
+        URL url = new URL(getBaseApiEndpoint()+ player);
+//
+//        return mapper.readValue(new URL(getBaseApiEndpoint()) + player, Player.class);
+
+//
+
+        HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+        huc.setRequestMethod("HEAD");
+        int responseCode = huc.getResponseCode();
+        if (responseCode == 404){
+            System.out.println("Couldnt find your player, so here's sverre instead");
+            return mapper.readValue(new URL(getBaseApiEndpoint()+ "sverre"), Player.class);
+        }
+        else
+        {
+            return mapper.readValue(new URL(getBaseApiEndpoint()+ player), Player.class);
+        }
+
+       // return mapper.readValue(new URL(getBaseApiEndpoint()+ player), Player.class);
+
+    }
+
+
     private String getApi_endpoint() {
         return "http://smashranking.eu/api/smashers/v-dogg-no/";
+    }
+
+    public String getBaseApiEndpoint(){
+        return "http://smashranking.eu/api/smashers/";
     }
 
     public static void main(String[] args) throws IOException {
@@ -64,7 +96,9 @@ class Player {
     public String toString() {
         return "Name: " + getName() +
             "\nEU Rank: " + getEurank() +
-            "\nNational rank " + getCountry_rank();
+            "\nNational rank " + getCountry_rank() +
+            "\nNationality: " + getCountry()+
+            "\n";
     }
 
     public boolean isActive() {

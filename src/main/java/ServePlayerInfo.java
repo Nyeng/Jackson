@@ -2,6 +2,14 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,16 +24,36 @@ public class ServePlayerInfo {
         return mapper.readValue(new URL(getApi_endpoint()), Player.class);
     }
 
+
+    public Player consumePlayerApache(String player) throws Exception {
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        Player playerObject;
+        try {
+            HttpGet httpget = new HttpGet(getBaseApiEndpoint() + player);
+            //System.out.println("Executing request " + httpget.getRequestLine());
+            // Create a custom response handler
+            ResponseHandler<String> responseHandler = response -> {
+                int status = response.getStatusLine().getStatusCode();
+                if (status >= 200 && status < 300) {
+                    HttpEntity entity = response.getEntity();
+                    return entity != null ? EntityUtils.toString(entity) : null;
+                } else {
+                    throw new ClientProtocolException(
+                        "Unexpected response status: " + status + "for player: " + player);
+                }
+            };
+            String responseBody = httpclient.execute(httpget, responseHandler);
+            playerObject = mapper.readValue(responseBody, Player.class);
+        } finally {
+            httpclient.close();
+        }
+        return playerObject;
+    }
+
     public Player consumePlayer(String player) throws IOException,NullPointerException {
-
        //This one works:  return mapper.readValue(new URL(getBaseApiEndpoint()+ player), Player.class);
-
         URL url = new URL(getBaseApiEndpoint()+ player);
-//
 //        return mapper.readValue(new URL(getBaseApiEndpoint()) + player, Player.class);
-
-//
-
         HttpURLConnection huc = (HttpURLConnection) url.openConnection();
         huc.setRequestMethod("HEAD");
         int responseCode = huc.getResponseCode();

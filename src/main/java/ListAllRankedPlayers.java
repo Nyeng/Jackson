@@ -25,11 +25,14 @@ public class ListAllRankedPlayers {
         return new JSONArray(IOUtils.toString(new URL(apiEndpoint), Charset.forName("UTF-8"))).toString();
     }
 
-    public static void main(String[] args) throws IOException {
-        ListAllRankedPlayers listOfPlayersClass = new ListAllRankedPlayers();
-        List<RankingList> playersToBeModified = listOfPlayersClass.ranks();
-        listOfPlayersClass.getCountryDataForEachPlayer(playersToBeModified);
+    public static void main(String[] args) throws Exception {
 
+
+        ListAllRankedPlayers listOfPlayersClass = new ListAllRankedPlayers();
+
+        ServePlayerInfo playerInfo = new ServePlayerInfo();
+
+        List<RankingList> playersToBeModified = listOfPlayersClass.ranks();
         listOfPlayersClass.generateListOfNorwegianPlayers(playersToBeModified);
 
 
@@ -56,21 +59,21 @@ public class ListAllRankedPlayers {
 
     }
 
-    public void generateListOfNorwegianPlayers(List<RankingList> playerRanks) throws IOException {
+    public void generateListOfNorwegianPlayers(List<RankingList> playerRanks) throws Exception {
         ServePlayerInfo playerInfo = new ServePlayerInfo();
 
-
         int i = 0;
-        for(RankingList player : playerRanks){
+        for (RankingList player : playerRanks) {
             //System.out.println(player.getSlug());
 
             //playerInfo.consumePlayer("R3D");
+            Player playerObject = playerInfo.consumePlayerApache(player.getSlug());
 
-            if (playerInfo.consumePlayer(player.getSlug()).getCountry().equals("Norway")){
-                System.out.println("Player: "+ player.getSlug());
+            if (playerObject.getCountry() != null && playerObject.getCountry().equals("Norway")) {
+                System.out.println(playerObject.toString());
             }
             i += 1;
-            if (i > 2000){
+            if (i > 2000) {
                 break;
             }
             System.out.println(i);
@@ -79,7 +82,6 @@ public class ListAllRankedPlayers {
 
 
     }
-
 
 
 }

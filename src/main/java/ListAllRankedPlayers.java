@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,27 +23,25 @@ public class ListAllRankedPlayers {
 
     public static void main(String[] args) throws Exception {
         ListAllRankedPlayers listOfPlayersClass = new ListAllRankedPlayers();
+        List<RankedEuropeanPlayers> europeanPlayers = listOfPlayersClass.getEuropeanRankedPlayers();
+        List<Player> norwegianRankedPlayers = listOfPlayersClass.fetchNorwegiansFromEuroRank(europeanPlayers,50);
 
-        List<RankedEuropeanPlayers> playersToBeModified = listOfPlayersClass.getEuropeanRankedPlayers();
-        listOfPlayersClass.generateListOfNorwegianPlayers(playersToBeModified);
+        //Read all Norwegian players to json file
+        mapper.writeValue(new File("norwegianplayers.json"), norwegianRankedPlayers);
+        //NorwegianPlayers norwegianPlayers = new NorwegianPlayers()
     }
 
-    public List<RankedEuropeanPlayers> getEuropeanRankedPlayers() throws Exception {
+
+    private List<RankedEuropeanPlayers> getEuropeanRankedPlayers() throws Exception {
         String json = playerInfo.consumeApi(getGeneralRankPath());
         return Arrays.asList(mapper.readValue(json, RankedEuropeanPlayers[].class));
-
-//        Todo: keeping this for learning purposes
-//        List<RankedEuropeanPlayers> players = jsonObjectsOfRanks.stream()
-//            .filter(p -> p.getSlug().equals("armada"))
-//            .collect(Collectors.toList());
     }
 
-    public ArrayList generateListOfNorwegianPlayers(List<RankedEuropeanPlayers> playerRanks) throws Exception {
+    private List<Player> fetchNorwegiansFromEuroRank(List<RankedEuropeanPlayers> playerRanks,int numberOfPlayers) throws Exception {
         ServePlayerInfo playerInfo = new ServePlayerInfo();
         List<Player> playerObjects = new ArrayList<>();
 
         int i = 0;
-
 
         for (RankedEuropeanPlayers player : playerRanks) {
 
@@ -51,45 +50,16 @@ public class ListAllRankedPlayers {
 
             if (smasher.getCountry() != null &&
                 smasher.getCountry().equals("Norway")) {
-                System.out.println(smasher.toString());
                 playerObjects.add(smasher);
 
-                //Save json to file
-                // add to list, then save to file
                 i += 1;
             }
-            if (i > 3) {
+            if (i > numberOfPlayers) {
                 break;
             }
         }
-
-        return (ArrayList) playerObjects;
+        return playerObjects;
     }
-
-    private String saveToFile(String playerJson) {
-        playerJson += "," +
-        "players.{"
-            + "Player{}, \n"
-            + "Player{} \n";
-
-        return playerJson;
-    }
-
-    private class NorwegianPlayers{
-
-        ArrayList<Player> players;
-
-        public NorwegianPlayers(){
-            players = new ArrayList<>();
-        }
-
-        public void addPlayer(ArrayList<Player> players){
-            Player player = new Player();
-            players.add(player);
-        }
-
-    }
-
 }
 
 class RankedEuropeanPlayers {

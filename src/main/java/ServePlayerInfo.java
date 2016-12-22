@@ -37,20 +37,16 @@ public class ServePlayerInfo {
                 }
             };
             responseBody = httpclient.execute(httpget, responseHandler);
-           // playerObject = mapper.readValue(responseBody, Player.class);
         }
         return responseBody;
     }
 
-
     public Player returnPlayerObject(String json) throws IOException {
         return mapper.readValue(json,Player.class);
     }
-
     public String getBaseApiEndpoint(){
         return "http://smashranking.eu/api";
     }
-
 }
 
 /**
@@ -91,34 +87,34 @@ class Player {
 
     @Override
     public String toString() {
-        return "Player{" +
-            "active=" + active +
-            ", tag='" + tag + '\'' +
-            ", team='" + team + '\'' +
-            ", name='" + name + '\'' +
-            ", nationality='" + nationality + '\'' +
-            ", country='" + country + '\'' +
-            ", city='" + city + '\'' +
-            ", region='" + region + '\'' +
-            ", main='" + main + '\'' +
-            ", secondary='" + secondary + '\'' +
-            ", tertiary='" + tertiary + '\'' +
-            ", quaternary='" + quaternary + '\'' +
-            ", tournaments='" + tournaments + '\'' +
+        return "{ Tag:'" + tag + "{" +
+            "active:" + active +
+            ", team:'" + team + '\'' +
+            ", name:'" + name + '\'' +
+            ", nationality:'" + nationality + '\'' +
+            ", country:'" + country + '\'' +
+            ", city:'" + city + '\'' +
+            ", region:'" + region + '\'' +
+            ", main:'" + main + '\'' +
+            ", secondary:'" + secondary + '\'' +
+            ", tertiary:'" + tertiary + '\'' +
+            ", quaternary:'" + quaternary + '\'' +
+            ", tournaments:'" + tournaments + '\'' +
             ", wins=" + wins +
             ", losses=" + losses +
             ", ratio=" + ratio +
             ", mu=" + mu +
             ", sigma=" + sigma +
             ", ts=" + ts +
-            ", facebook='" + facebook + '\'' +
-            ", twitter='" + twitter + '\'' +
-            ", twitch='" + twitch + '\'' +
-            ", youtube='" + youtube + '\'' +
-            ", eurank=" + eurank +
-            ", country_rank=" + country_rank +
-            ", character_rank=" + character_rank +
-            '}';
+            ", facebook:'" + facebook + '\'' +
+            ", twitter:'" + twitter + '\'' +
+            ", twitch:'" + twitch + '\'' +
+            ", youtube:'" + youtube + '\'' +
+            ", eurank: '" + eurank +
+            ", country_rank: '" + country_rank +
+            ", character_rank: '" + character_rank +
+            '}'
+            ;
     }
 
     public Player() { }

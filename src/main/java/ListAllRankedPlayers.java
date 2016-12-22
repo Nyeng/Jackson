@@ -10,69 +10,93 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ListAllRankedPlayers {
 
+    public ListAllRankedPlayers() {}
+
     private String getGeneralRankPath() {
         return "/ranking";
     }
 
-    ServePlayerInfo playerInfo = new ServePlayerInfo();
+    private ServePlayerInfo playerInfo = new ServePlayerInfo();
 
     private static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) throws Exception {
         ListAllRankedPlayers listOfPlayersClass = new ListAllRankedPlayers();
 
-        List<RankingList> playersToBeModified = listOfPlayersClass.ranks();
+        List<RankedEuropeanPlayers> playersToBeModified = listOfPlayersClass.getEuropeanRankedPlayers();
         listOfPlayersClass.generateListOfNorwegianPlayers(playersToBeModified);
     }
 
-    public List<RankingList> ranks() throws Exception {
+    public List<RankedEuropeanPlayers> getEuropeanRankedPlayers() throws Exception {
         String json = playerInfo.consumeApi(getGeneralRankPath());
-        return Arrays.asList(mapper.readValue(json,RankingList[].class));
+        return Arrays.asList(mapper.readValue(json, RankedEuropeanPlayers[].class));
 
 //        Todo: keeping this for learning purposes
-//        List<RankingList> players = jsonObjectsOfRanks.stream()
+//        List<RankedEuropeanPlayers> players = jsonObjectsOfRanks.stream()
 //            .filter(p -> p.getSlug().equals("armada"))
 //            .collect(Collectors.toList());
     }
 
-
-    public void generateListOfNorwegianPlayers(List<RankingList> playerRanks) throws Exception {
+    public ArrayList generateListOfNorwegianPlayers(List<RankedEuropeanPlayers> playerRanks) throws Exception {
         ServePlayerInfo playerInfo = new ServePlayerInfo();
         List<Player> playerObjects = new ArrayList<>();
 
         int i = 0;
-        for (RankingList player : playerRanks) {
 
-            String playerJson = playerInfo.consumeApi("/smashers/"+ player.getSlug());
+
+        for (RankedEuropeanPlayers player : playerRanks) {
+
+            String playerJson = playerInfo.consumeApi("/smashers/" + player.getSlug());
             Player smasher = playerInfo.returnPlayerObject(playerJson);
 
             if (smasher.getCountry() != null &&
                 smasher.getCountry().equals("Norway")) {
-                //System.out.println(smasher.toString());
-                playerObjects.add(i,smasher);
-                i+=1;
+                System.out.println(smasher.toString());
+                playerObjects.add(smasher);
+
+                //Save json to file
+                // add to list, then save to file
+                i += 1;
             }
-            if (i > 5) {
+            if (i > 3) {
                 break;
             }
         }
 
-        for (Player players : playerObjects){
-            System.out.println(players.toString());
+        return (ArrayList) playerObjects;
+    }
+
+    private String saveToFile(String playerJson) {
+        playerJson += "," +
+        "players.{"
+            + "Player{}, \n"
+            + "Player{} \n";
+
+        return playerJson;
+    }
+
+    private class NorwegianPlayers{
+
+        ArrayList<Player> players;
+
+        public NorwegianPlayers(){
+            players = new ArrayList<>();
+        }
+
+        public void addPlayer(ArrayList<Player> players){
+            Player player = new Player();
+            players.add(player);
         }
 
     }
 
-    public void NorwegianPlayers(){
-        String rankApi = getGeneralRankPath();
-    }
 }
 
-class RankingList{
+class RankedEuropeanPlayers {
 
-    public RankingList(){}
+    public RankedEuropeanPlayers() {}
 
-    public String toString(){
+    public String toString() {
         return "\nName: " + getSlug() +
             "\nEurank: " + getEurank()
             ;
@@ -85,7 +109,7 @@ class RankingList{
         return eurank;
     }
 
-    public String getSlug() {return slug;    }
+    public String getSlug() {return slug; }
 
     public void setEurank(int eurank) {this.eurank = eurank;}
 

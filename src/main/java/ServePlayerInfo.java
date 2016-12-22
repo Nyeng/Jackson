@@ -1,6 +1,4 @@
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -11,6 +9,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -20,17 +19,11 @@ public class ServePlayerInfo {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Player consumePLayerApi() throws IOException {
-        return mapper.readValue(new URL(getApi_endpoint()), Player.class);
-    }
+    public String consumeApi(String path) throws Exception {
+        String responseBody;
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            HttpGet httpget = new HttpGet(getBaseApiEndpoint() + path);
 
-
-    public Player consumePlayerApache(String player) throws Exception {
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        Player playerObject;
-        try {
-            HttpGet httpget = new HttpGet(getBaseApiEndpoint() + player);
-            //System.out.println("Executing request " + httpget.getRequestLine());
             // Create a custom response handler
             ResponseHandler<String> responseHandler = response -> {
                 int status = response.getStatusLine().getStatusCode();
@@ -39,49 +32,23 @@ public class ServePlayerInfo {
                     return entity != null ? EntityUtils.toString(entity) : null;
                 } else {
                     throw new ClientProtocolException(
-                        "Unexpected response status: " + status + "for player: " + player);
+                        "Unexpected response status: " + status + "for path: " + path +
+                    "\n whole path:" + getBaseApiEndpoint() + path);
                 }
             };
-            String responseBody = httpclient.execute(httpget, responseHandler);
-            playerObject = mapper.readValue(responseBody, Player.class);
-        } finally {
-            httpclient.close();
+            responseBody = httpclient.execute(httpget, responseHandler);
+           // playerObject = mapper.readValue(responseBody, Player.class);
         }
-        return playerObject;
-    }
-
-    public Player consumePlayer(String player) throws IOException,NullPointerException {
-       //This one works:  return mapper.readValue(new URL(getBaseApiEndpoint()+ player), Player.class);
-        URL url = new URL(getBaseApiEndpoint()+ player);
-//        return mapper.readValue(new URL(getBaseApiEndpoint()) + player, Player.class);
-        HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-        huc.setRequestMethod("HEAD");
-        int responseCode = huc.getResponseCode();
-        if (responseCode == 404){
-            System.out.println("Couldnt find your player, so here's sverre instead");
-            return mapper.readValue(new URL(getBaseApiEndpoint()+ "sverre"), Player.class);
-        }
-        else
-        {
-            return mapper.readValue(new URL(getBaseApiEndpoint()+ player), Player.class);
-        }
-
-       // return mapper.readValue(new URL(getBaseApiEndpoint()+ player), Player.class);
-
+        return responseBody;
     }
 
 
-    private String getApi_endpoint() {
-        return "http://smashranking.eu/api/smashers/v-dogg-no/";
+    public Player returnPlayerObject(String json) throws IOException {
+        return mapper.readValue(json,Player.class);
     }
 
     public String getBaseApiEndpoint(){
-        return "http://smashranking.eu/api/smashers/";
-    }
-
-    public static void main(String[] args) throws IOException {
-        ServePlayerInfo playainfo = new ServePlayerInfo();
-        System.out.println(playainfo.consumePLayerApi().toString());
+        return "http://smashranking.eu/api";
     }
 
 }
@@ -89,6 +56,9 @@ public class ServePlayerInfo {
 /**
  * Created by k79689 on 15.12.16.
  */
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonSerialize.Inclusion.NON_NULL) // or JsonSerialize.Inclusion.NON_EMPTY
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Player {
 
@@ -149,9 +119,7 @@ class Player {
         return nationality;
     }
 
-    public String getCountry() {
-        return country;
-    }
+    public String getCountry() {return country;   }
 
     public String getCity() {
         return city;

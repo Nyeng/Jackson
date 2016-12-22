@@ -1,11 +1,6 @@
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,77 +10,63 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ListAllRankedPlayers {
 
-    private String getApi_endpoint() {
-        return "http://smashranking.eu/api/ranking/";
+    private String getGeneralRankPath() {
+        return "/ranking";
     }
+
+    ServePlayerInfo playerInfo = new ServePlayerInfo();
 
     private static ObjectMapper mapper = new ObjectMapper();
 
-    public String getJsonFromUrl(String apiEndpoint) throws IOException {
-        return new JSONArray(IOUtils.toString(new URL(apiEndpoint), Charset.forName("UTF-8"))).toString();
-    }
-
     public static void main(String[] args) throws Exception {
-
-
         ListAllRankedPlayers listOfPlayersClass = new ListAllRankedPlayers();
-
-        ServePlayerInfo playerInfo = new ServePlayerInfo();
 
         List<RankingList> playersToBeModified = listOfPlayersClass.ranks();
         listOfPlayersClass.generateListOfNorwegianPlayers(playersToBeModified);
-
-
-
     }
 
-    public List<RankingList> ranks() throws IOException {
-        String jsonArray = getJsonFromUrl(getApi_endpoint());
-        List<RankingList> jsonObjectsOfRanks = Arrays.asList(mapper.readValue(jsonArray, RankingList[].class));
+    public List<RankingList> ranks() throws Exception {
+        String json = playerInfo.consumeApi(getGeneralRankPath());
+        return Arrays.asList(mapper.readValue(json,RankingList[].class));
 
-        //Todo: keeping this for learning purposes
+//        Todo: keeping this for learning purposes
 //        List<RankingList> players = jsonObjectsOfRanks.stream()
 //            .filter(p -> p.getSlug().equals("armada"))
 //            .collect(Collectors.toList());
-
-        return jsonObjectsOfRanks;
     }
 
-    public void getCountryDataForEachPlayer(List<RankingList> rankedPlayers){
-
-//        for(RankingList player : rankedPlayers){
-//            System.out.println(player.getSlug());
-//        }
-
-    }
 
     public void generateListOfNorwegianPlayers(List<RankingList> playerRanks) throws Exception {
         ServePlayerInfo playerInfo = new ServePlayerInfo();
 
+
+        //Lambda attempt
+        Stream<RankingList> dude = playerRanks.stream()
+            .filter(p -> p.getSlug().contains("Zorc"));
+
+        System.out.println(dude.findFirst());
+
         int i = 0;
         for (RankingList player : playerRanks) {
-            //System.out.println(player.getSlug());
 
-            //playerInfo.consumePlayer("R3D");
-            Player playerObject = playerInfo.consumePlayerApache(player.getSlug());
+            String playerJson = playerInfo.consumeApi("/smashers/"+ player.getSlug());
+            Player smasher = playerInfo.returnPlayerObject(playerJson);
 
-            if (playerObject.getCountry() != null && playerObject.getCountry().equals("Norway")) {
-                System.out.println(playerObject.toString());
+            if (smasher.getCountry() != null &&
+                smasher.getCountry().equals("Norway")) {
+                System.out.println(smasher.toString());
+                i+=1;
             }
-            i += 1;
-            if (i > 2000) {
+            if (i > 50) {
                 break;
             }
-            System.out.println(i);
         }
-// 487
-
-
     }
 
-
+    public void NorwegianPlayers(){
+        String rankApi = getGeneralRankPath();
+    }
 }
-
 
 class RankingList{
 

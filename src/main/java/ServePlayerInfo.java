@@ -89,15 +89,39 @@ class Player {
     Integer country_rank;
     Integer character_rank;
 
-    public Player() { }
-
+    @Override
     public String toString() {
-        return "Name: " + getName() +
-            "\nEU Rank: " + getEurank() +
-            "\nNational rank " + getCountry_rank() +
-            "\nNationality: " + getCountry()+
-            "\n";
+        return "Player{" +
+            "active=" + active +
+            ", tag='" + tag + '\'' +
+            ", team='" + team + '\'' +
+            ", name='" + name + '\'' +
+            ", nationality='" + nationality + '\'' +
+            ", country='" + country + '\'' +
+            ", city='" + city + '\'' +
+            ", region='" + region + '\'' +
+            ", main='" + main + '\'' +
+            ", secondary='" + secondary + '\'' +
+            ", tertiary='" + tertiary + '\'' +
+            ", quaternary='" + quaternary + '\'' +
+            ", tournaments='" + tournaments + '\'' +
+            ", wins=" + wins +
+            ", losses=" + losses +
+            ", ratio=" + ratio +
+            ", mu=" + mu +
+            ", sigma=" + sigma +
+            ", ts=" + ts +
+            ", facebook='" + facebook + '\'' +
+            ", twitter='" + twitter + '\'' +
+            ", twitch='" + twitch + '\'' +
+            ", youtube='" + youtube + '\'' +
+            ", eurank=" + eurank +
+            ", country_rank=" + country_rank +
+            ", character_rank=" + character_rank +
+            '}';
     }
+
+    public Player() { }
 
     public boolean isActive() {
         return active;

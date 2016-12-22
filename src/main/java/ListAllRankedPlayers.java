@@ -1,6 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,13 +38,7 @@ public class ListAllRankedPlayers {
 
     public void generateListOfNorwegianPlayers(List<RankingList> playerRanks) throws Exception {
         ServePlayerInfo playerInfo = new ServePlayerInfo();
-
-
-        //Lambda attempt
-        Stream<RankingList> dude = playerRanks.stream()
-            .filter(p -> p.getSlug().contains("Zorc"));
-
-        System.out.println(dude.findFirst());
+        List<Player> playerObjects = new ArrayList<>();
 
         int i = 0;
         for (RankingList player : playerRanks) {
@@ -54,13 +48,19 @@ public class ListAllRankedPlayers {
 
             if (smasher.getCountry() != null &&
                 smasher.getCountry().equals("Norway")) {
-                System.out.println(smasher.toString());
+                //System.out.println(smasher.toString());
+                playerObjects.add(i,smasher);
                 i+=1;
             }
-            if (i > 50) {
+            if (i > 5) {
                 break;
             }
         }
+
+        for (Player players : playerObjects){
+            System.out.println(players.toString());
+        }
+
     }
 
     public void NorwegianPlayers(){

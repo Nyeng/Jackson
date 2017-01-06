@@ -10,27 +10,48 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ReadNorwegianPlayersFromJsonFile {
 
-
     public ReadNorwegianPlayersFromJsonFile(){}
 
     public static void main(String[]args) throws IOException {
-        ReadNorwegianPlayersFromJsonFile readJson = new ReadNorwegianPlayersFromJsonFile();
-        readJson.readJson();
+        ReadNorwegianPlayersFromJsonFile norwegianPlayas = new ReadNorwegianPlayersFromJsonFile();
 
+        ObjectMapper mapper = new ObjectMapper();
+        List<Player> players = mapper.readValue(new File("norwegianplayers.json"), new TypeReference<List<Player>>(){});
+
+        long start_time = System.currentTimeMillis();
+
+        norwegianPlayas.searchForPlayer(players,"Zorc");
+
+        long endTimeForLoop = System.currentTimeMillis();
+
+        Player player = norwegianPlayas.searchForPlayerUsingStreams(players,"Zorc");
+        System.out.println(player);
+
+        long endStream = System.currentTimeMillis();
+
+        System.out.println("For loop time taken: " + (endTimeForLoop - start_time));
+        System.out.println("Stream time taken: " + (endStream - endTimeForLoop));
     }
 
-    ObjectMapper mapper = new ObjectMapper();
+    private Player searchForPlayerUsingStreams(List<Player> players, String zorc) {
+        System.out.println("Find Zorc using streams: ");
 
+        Player result = players.stream().
+            filter(x -> x.tag.contains(zorc))
+            .findAny()
+            .orElse(null);
 
-    private void readJson() throws IOException {
-        //convert players array of players
-        //Player[] playerObjects = mapper.readValue(new File("norwegianplayers.json"),Player[].class);
+        return result;
+    }
 
-        List<Player> myObjects = mapper.readValue(new File("norwegianplayers.json"), new TypeReference<List<Player>>(){});
-
-        for (Player player : myObjects){
-            System.out.println("\n" + player.tag);
+    public void searchForPlayer(List<Player> players, String searchTerm){
+        for (Player player : players){
+            if (player.tag.contains(searchTerm)){
+                System.out.println("Found player with tag(s): "+player.toString());
+            }
         }
 
     }
+
+
 }

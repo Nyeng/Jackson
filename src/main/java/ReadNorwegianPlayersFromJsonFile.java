@@ -10,27 +10,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ReadNorwegianPlayersFromJsonFile {
 
+    static ObjectMapper mapper;
+
     public ReadNorwegianPlayersFromJsonFile(){}
 
     public static void main(String[]args) throws IOException {
         ReadNorwegianPlayersFromJsonFile norwegianPlayas = new ReadNorwegianPlayersFromJsonFile();
 
-        ObjectMapper mapper = new ObjectMapper();
+        mapper = new ObjectMapper();
         List<Player> players = mapper.readValue(new File("norwegianplayers.json"), new TypeReference<List<Player>>(){});
 
-        long start_time = System.currentTimeMillis();
 
         norwegianPlayas.searchForPlayer(players,"Zorc");
-
-        long endTimeForLoop = System.currentTimeMillis();
 
         Player player = norwegianPlayas.searchForPlayerUsingStreams(players,"Zorc");
         System.out.println(player);
 
-        long endStream = System.currentTimeMillis();
+    }
 
-        System.out.println("For loop time taken: " + (endTimeForLoop - start_time));
-        System.out.println("Stream time taken: " + (endStream - endTimeForLoop));
+    public List<Player> listNorwegianPlayers() throws IOException {
+        mapper = new ObjectMapper();
+        return mapper.readValue(new File("norwegianplayers.json"), new TypeReference<List<Player>>(){});
     }
 
     private Player searchForPlayerUsingStreams(List<Player> players, String zorc) {
@@ -47,10 +47,9 @@ public class ReadNorwegianPlayersFromJsonFile {
     public void searchForPlayer(List<Player> players, String searchTerm){
         for (Player player : players){
             if (player.tag.contains(searchTerm)){
-                System.out.println("Found player with tag(s): "+player.toString());
+                System.out.println("Found player with tag(s): "+player.getName());
             }
         }
-
     }
 
 
